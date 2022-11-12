@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TeacherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/teachers',[TeacherController::class, 'index'])->name('teachers.index');
+Route::get('teachers/create', [TeacherController::class, 'create'])->name('teachers.create');
+Route::post('/teacher', [TeacherController::Class, 'store'])->name('teachers.store');
