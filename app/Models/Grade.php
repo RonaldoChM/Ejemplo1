@@ -19,7 +19,7 @@ class Grade extends Model
 
     public function teacher()
     {
-        return $this->belongsTo(Teacher::clas);
+        return $this->belongsTo(Teacher::class);
     }
 
 }

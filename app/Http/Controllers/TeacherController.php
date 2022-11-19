@@ -15,7 +15,9 @@ class TeacherController extends Controller
     public function index()
     {
         $teacher = Teacher::all();
-        return view('teachers.index',['teachers' => $teacher]);
+        return response()->json($teacher);
+        /*$teacher = Teacher::all();
+        return view('teachers.index',['teachers' => $teacher]);*/
     }
 
     /**
