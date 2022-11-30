@@ -7,11 +7,7 @@ use App\Models\Teacher;
 
 class TeacherController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         $teacher = Teacher::all();
@@ -20,42 +16,47 @@ class TeacherController extends Controller
         return view('teachers.index',['teachers' => $teacher]);*/
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+   
     public function create()
     {
-        return view('teachers.create');
+       // return view('teachers.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+   
     public function store(Request $request)
     {
-        $teacher = new Teacher();
-        $teacher->full_name = $request->full_name;
-        $teacher->profession = $request->profession;
-        $teacher->grade_academy = $request->grade_academy;
-        $teacher->cell_phone = $request->cell_phone;
+        /* 
+           $table->id();
+            $table->string('full_name');
+            $table->string('profession');
+            $table->integer('grade_academy');
+            $table->string('cell_phone'); 
+        */
+        $validate = $request->validate([
+            'full_name' => "required",
+            'profession' => "required",
+            "grade_academy" => "required",
+            "cell_phone" => "required"
+        ]);
 
-        $teacher->save();
+        try{
+            $teacher = new Teacher();
+            $teacher->full_name = $request->full_name;
+            $teacher->profession = $request->profession;
+            $teacher->grade_academy = $request->grade_academy;
+            $teacher->cell_phone = $request->cell_phone;
+            $teacher->save();
+            return response()->json(['message' => 'El Profesor fue creado exitosamente']);
+        } catch (\Exception $exc) {
+            //throw $th;
+            return response()->json(['message' => 'Error al registrar al Profesor. Debido a: ' . $exc]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $teacher = Teacher::find($id);
+        return response()->json($teacher);
     }
 
     /**
@@ -69,26 +70,46 @@ class TeacherController extends Controller
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+ 
     public function update(Request $request, $id)
-    {
-        //
+    {       
+         /* 
+           $table->id();
+            $table->string('full_name');
+            $table->string('profession');
+            $table->integer('grade_academy');
+            $table->string('cell_phone'); 
+        */
+        $valitaion = $request->validate([
+            "full_name" => "required",
+            "profession" => "required",
+            "grade_academy" => "required",
+            "cell_phone" => "required",
+        ]);
+
+        try{
+            $teacher = Teacher::find($id);
+            $teacher->full_name = $request->full_name;
+            $teacher->profession = $request->profession;
+            $teacher->grade_academy = $request->grade_academy;
+            $teacher->cell_phone = $request->cell_phone;
+            $teacher->save();
+        return response()->json(['message' => 'El registro del profesor ' . $teacher->full_name . ' fue actualizado correctamente']);
+        } catch (\Exception $exc) {
+            //throw $th;
+            return response()->json(['message' => 'Error al registrar al profesor. Debido a: ' . $exc]);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        try {
+            $teacher = Teacher::find($id);
+            $teacher->delete();
+            return response()->json(['message' => 'El registro se elimino correctamente']);
+        } catch (\Exception $exc) {
+
+            return response()->json(['message' => 'Error al eliminar el registro. Debido a: ' . $exc]);
+        }
     }
 }
