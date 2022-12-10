@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\DB;
 class GradeStudentController extends Controller
 {
     public function index(){
-        /*$gradestudent = GradeStudent::join("grades","grades.id","=","grade_student.grade_id")->select("*")->groupBy("students.id"); 
-        $gradestudent_2 = GradeStudent::join("students","students.id","=","grade_student.student_id")->select("*")->groupBy("grades.id")->union($gradestudent)->get();*/
-        $gradestudent = DB::table('grade_student')
-        ->join("grades","grades.id","=","grade_student.grade_id")
-        ->join("students","students.id","=","grade_student.student_id")
+       
+        $gradestudent = DB::table('grade_student as gs')
+        ->join("grades as g","g.id","=","gs.grade_id")
+        ->join("students as s","s.id","=","gs.student_id")
+        ->join("teachers as t", "t.id", "=", "g.teacher_id")
+        ->select('gs.id', 'g.name', 's.first_name', 's.last_name')
+        //->where('name', 'Fisica')
         ->get();
         return response()->json($gradestudent);
-
-        //GradeStudent::join("grades","grades.id","=","GradeStudent.grade_id")->select("*")->get(); 
 
     }
 
@@ -33,15 +33,25 @@ class GradeStudentController extends Controller
         $gradestudent->grade_id = $request->grade_id;
         $gradestudent->student_id = $request->student_id;       
         $gradestudent->save();
-        return response()->json(['message' => 'La clase y el alumno se emprejaron exitosamente']);
-    } catch (\Exception $exc) {
-        //throw $th;
-        return response()->json(['message' => 'Error al emparejar el estuduante con un curso. Debido a: ' . $exc]);
-    }
+        return response()->json(['message' => 'La clase y el alumno se emparejaron exitosamente']);
+        } catch (\Exception $exc) {
+            //throw $th;
+            return response()->json(['message' => 'Error al emparejar el estuduante con un curso. Debido a: ' . $exc]);
+        }
     }
 
     public function show($id){
-        $gradestudent = GradeStudent::find($id);
+        $gradestudent = DB::table('grade_student as gs')
+        ->join("grades as g","g.id","=","gs.grade_id")
+        ->join("students as s","s.id","=","gs.student_id")
+        ->join("teachers as t", "t.id", "=", "g.teacher_id")
+        ->select('gs.id', 
+        'g.name', 's.first_name', 
+        's.last_name', 't.full_name', 
+        't.profession', 's.cell_phone as s_phone',
+        't.cell_phone as t_phone', 'gs.student_id', 'gs.grade_id')
+        ->where('gs.id', $id)
+        ->get();
         return response()->json($gradestudent);
     }
     public function update($id, Request $request){
@@ -50,12 +60,12 @@ class GradeStudentController extends Controller
             'grade_id' => "required",
             'student_id' => "required"
         ]);
-
+        
         try{
             $gradestudent = GradeStudent::find($id);
             $gradestudent->grade_id = $request->grade_id;
             $gradestudent->student_id = $request->student_id;           
-            $student->save();
+            $gradestudent->save();
         return response()->json(['message' => 'El registro del curso ' . $gradestudent->grade_id . ' con el estudiante' . $gradestudent->student_id .' fue actualizado correctamente']);
         } catch (\Exception $exc) {
             //throw $th;
